@@ -41,20 +41,6 @@ namespace PackStream.NET.Packers
             04 05 06  -- Struct(sig=0x7F, fields=[1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6]
      */
 
-
-    public interface IPacker
-    {
-        byte[] Pack<T>(T content);
-    }
-
-    public interface IUnpacker
-    {
-        T Unpack<T>(byte[] content) where T : new();
-        int GetSizeInBytes(byte[] content, bool includeMarker = true);
-        bool IsUnpackable(byte[] content);
-    }
-
-
     public static partial class Packers
     {
         public static class Struct
@@ -81,12 +67,12 @@ namespace PackStream.NET.Packers
                 return (content[0] >= 0xB0 && content[0] <= 0xBF) || content[0] == 0xDC || content[0] == 0xDD;
             }
 
-            public static global::PackStream.NET.Packers.Struct Unpack(byte[] content)
+            public static global::PackStream.NET.Struct Unpack(byte[] content)
             {
                 if (!IsStruct(content))
                     throw new ArgumentException("Content doesn't represent a Struct.", nameof(content));
 
-                var output = new global::PackStream.NET.Packers.Struct(content);
+                var output = new global::PackStream.NET.Struct(content);
                 output.NumberOfFields = GetNumberOfFields(content);
                 output.SignatureByte = GetSignatureByte(content, output.NumberOfFields);
 

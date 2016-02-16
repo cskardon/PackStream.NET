@@ -64,12 +64,12 @@ namespace PackStream.NET.Packers
             {
                 var typeInfo = content.GetType().GetTypeInfo();
                 var fields = typeInfo.DeclaredFields
-                    .Where(f => f.IsPublic && !f.IsDefined( typeof (BoltIgnoreAttribute)))
+                    .Where(f => f.IsPublic && !f.IsDefined( typeof (PackStreamIgnoreAttribute)))
                     .ToList();
 
                 //TODO this will serialize it all!!!! -- only want public instance properties but doesn't get base properties
                 var properties = content.GetType().GetRuntimeProperties()
-                    .Where(prop => !prop.IsDefined(typeof (BoltIgnoreAttribute))).ToList();
+                    .Where(prop => !prop.IsDefined(typeof (PackStreamIgnoreAttribute))).ToList();
 
                 var dictionary = fields.ToDictionary(field => field.Name, field => field.GetValue(content));
                 foreach (var prop in properties)
@@ -269,12 +269,12 @@ namespace PackStream.NET.Packers
 
                 //TODO: Getting static and private properties!!!
                 var properties = type.GetRuntimeProperties()
-                    .Where(prop => !prop.IsDefined(typeof (BoltIgnoreAttribute)));
+                    .Where(prop => !prop.IsDefined(typeof (PackStreamIgnoreAttribute)));
                 foreach (var property in properties)
                     if (toConvert.ContainsKey(property.Name))
                         property.SetValue(obj, (object) toConvert[property.Name]);
 
-                var fields = type.GetTypeInfo().DeclaredFields.Where(field => field.IsPublic && !field.IsDefined(typeof (BoltIgnoreAttribute)));
+                var fields = type.GetTypeInfo().DeclaredFields.Where(field => field.IsPublic && !field.IsDefined(typeof (PackStreamIgnoreAttribute)));
                 foreach (var field in fields)
                     if (toConvert.ContainsKey(field.Name))
                         field.SetValue(obj, (object) toConvert[field.Name]);

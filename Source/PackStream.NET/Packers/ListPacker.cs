@@ -50,7 +50,8 @@ namespace PackStream.NET.Packers
 
             public static bool IsUnpackable(byte[] content)
             {
-                return (content[0] >= 0x90 && content[0] <= 0x9F) || (content[0] >= 0xD4 && content[0] <= 0xD6);
+                return (content[0] >= 0x90 && content[0] <= 0x9F)
+                    || (content[0] >= 0xD4 && content[0] <= 0xD6);
             }
 
             public static bool IsPackable(Type type)

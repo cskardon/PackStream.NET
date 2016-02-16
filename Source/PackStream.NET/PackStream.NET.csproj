@@ -37,8 +37,8 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BoltIgnoreAttribute.cs" />
-    <Compile Include="BoltProperty.cs" />
+    <Compile Include="Attributes\PackStreamIgnoreAttribute.cs" />
+    <Compile Include="Attributes\PackStreamPropertyAttribute.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Packed.cs" />
     <Compile Include="Packers\BitConverterBase.cs" />
@@ -48,14 +48,14 @@
     <Compile Include="Packers\IPacker.cs" />
     <Compile Include="Packers\ListPacker.cs" />
     <Compile Include="Packers\Markers.cs" />
-    <Compile Include="SignatureBytes.cs" />
-    <Compile Include="Packers\Struct.cs" />
-    <Compile Include="Packers\Node.cs" />
     <Compile Include="Packers\ObjectPacker.cs" />
+    <Compile Include="Packers\Packers.cs" />
+    <Compile Include="Struct.cs" />
+    <Compile Include="Packers\StructPacker.cs" />
     <Compile Include="PackStream.cs" />
     <Compile Include="Packers\StringPacker.cs" />
-    <Compile Include="Packers\StructPacker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SignatureBytes.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

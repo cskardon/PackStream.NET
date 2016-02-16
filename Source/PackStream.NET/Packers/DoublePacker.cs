@@ -28,18 +28,16 @@ namespace PackStream.NET.Packers
     {
         public static class Double
         {
-            private const byte Marker = 0xC1;
-
             public static byte[] Pack(double content)
             {
-                var output = new List<byte> {Marker};
+                var output = new List<byte> {Markers.Floating};
                 output.AddRange(BitConverter.GetBytes(content));
                 return output.ToArray();
             }
 
             public static double Unpack(byte[] content)
             {
-                var markerlessArray = content[0] == Marker ? content.Skip(1).ToArray() : content;
+                var markerlessArray = content[0] == Markers.Floating ? content.Skip(1).ToArray() : content;
                 return BitConverter.ToDouble(markerlessArray);
             }
 
@@ -55,7 +53,7 @@ namespace PackStream.NET.Packers
 
             public static bool Is(byte[] content)
             {
-                return content[0] == 0xC1;
+                return content[0] == Markers.Floating;
             }
         }
     }

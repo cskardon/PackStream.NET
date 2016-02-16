@@ -1,8 +1,11 @@
 namespace PackStream.NET.Packers
 {
-    public interface IPacker<T>
+    using System;
+
+    public interface IPacker
     {
-        byte[] Pack(T content);
-        T Unpack(byte[] content);
+        bool CanPack(Type type);
+        byte[] Pack(object content);
+        object Unpack(byte[] content);
     }
 }
