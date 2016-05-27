@@ -31,14 +31,14 @@ namespace PackStream.NET.Packers
             public static byte[] Pack(double content)
             {
                 var output = new List<byte> {Markers.Floating};
-                output.AddRange(BitConverter.GetBytes(content));
+                output.AddRange(PackStreamBitConverter.GetBytes(content));
                 return output.ToArray();
             }
 
             public static double Unpack(byte[] content)
             {
                 var markerlessArray = content[0] == Markers.Floating ? content.Skip(1).ToArray() : content;
-                return BitConverter.ToDouble(markerlessArray);
+                return PackStreamBitConverter.ToDouble(markerlessArray);
             }
 
             public static int GetExpectedSizeInBytes(byte[] content)

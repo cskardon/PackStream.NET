@@ -109,10 +109,10 @@ namespace PackStream.NET.Packers
                     return content[1];
 
                 if (content[0] == 0xD5)
-                    return int.Parse(global::PackStream.NET.Packers.Packers.BitConverter.ToString(content.Skip(1).Take(2).ToArray()).Replace("-", ""), NumberStyles.HexNumber);
+                    return int.Parse(PackStreamBitConverter.ToString(content.Skip(1).Take(2).ToArray()).Replace("-", ""), NumberStyles.HexNumber);
 
                 if (content[0] == 0xD6)
-                    return int.Parse(global::PackStream.NET.Packers.Packers.BitConverter.ToString(content.Skip(1).Take(4).ToArray()).Replace("-", ""), NumberStyles.HexNumber);
+                    return int.Parse(PackStreamBitConverter.ToString(content.Skip(1).Take(4).ToArray()).Replace("-", ""), NumberStyles.HexNumber);
 
                 throw new ArgumentException("Unknown marker", nameof(content));
             }

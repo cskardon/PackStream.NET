@@ -144,7 +144,7 @@ namespace PackStream.NET.Packers
 
             internal static byte[] ConvertLongToBytes(long value)
             {
-                var output = new List<byte>(BitConverter.GetBytes(value));
+                var output = new List<byte>(PackStreamBitConverter.GetBytes(value));
                 return value >= 0 ? ConvertPositiveLongs(output, value) : ConvertNegativeLongs(output, value);
             }
 
@@ -168,11 +168,11 @@ namespace PackStream.NET.Packers
                     case Markers.Int8:
                         return (sbyte) toInterpret[0];
                     case Markers.Int16:
-                        return BitConverter.ToInt16(toInterpret);
+                        return PackStreamBitConverter.ToInt16(toInterpret);
                     case Markers.Int32:
-                        return BitConverter.ToInt32(toInterpret);
+                        return PackStreamBitConverter.ToInt32(toInterpret);
                     case Markers.Int64:
-                        return BitConverter.ToInt64(toInterpret);
+                        return PackStreamBitConverter.ToInt64(toInterpret);
                     default:
                         throw new ArgumentOutOfRangeException(nameof(content), content[0], "Unknown Marker");
                 }

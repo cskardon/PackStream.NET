@@ -3,6 +3,8 @@ namespace PackStream.NET
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using global::PackStream.NET.Packers;
+
 
     public class Struct
     {
@@ -51,7 +53,7 @@ namespace PackStream.NET
         public override string ToString()
         {
             if (OriginalBytes != null && OriginalBytes.Length >= 0)
-                return BitConverter.ToString(OriginalBytes);
+                return PackStreamBitConverter.ToString(OriginalBytes);
             return "No original bytes to convert";
         }
     }

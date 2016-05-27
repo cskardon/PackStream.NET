@@ -41,7 +41,7 @@
     <Compile Include="Attributes\PackStreamPropertyAttribute.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Packed.cs" />
-    <Compile Include="Packers\BitConverterBase.cs" />
+    <Compile Include="Packers\PackStreamBitConverter.cs" />
     <Compile Include="Packers\BoolPacker.cs" />
     <Compile Include="Packers\DoublePacker.cs" />
     <Compile Include="Packers\IntPacker.cs" />
