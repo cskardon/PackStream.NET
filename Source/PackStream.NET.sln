@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PackStream.NET", "PackStream.NET\PackStream.NET.csproj", "{EBDB9176-85C6-4A8C-80D4-FF7535B0AFEA}"
 EndProject
@@ -9,6 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PackStream.NET.Tests", "Pac
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3C6B2678-EC56-4392-BD8A-499DFA44A5CF}"
 	ProjectSection(SolutionItems) = preProject
+		..\build.bat = ..\build.bat
 		..\LICENSE = ..\LICENSE
 		..\PackStream.NET.nuspec = ..\PackStream.NET.nuspec
 		..\README.md = ..\README.md
