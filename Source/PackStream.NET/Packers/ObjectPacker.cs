@@ -7,8 +7,7 @@ namespace PackStream.NET.Packers
     using System.Globalization;
     using System.Linq;
     using System.Reflection;
-    using global::PackStream;
-    using global::PackStream.NET;
+    using NET;
 
     /*
             Maps
@@ -64,12 +63,12 @@ namespace PackStream.NET.Packers
             {
                 var typeInfo = content.GetType().GetTypeInfo();
                 var fields = typeInfo.DeclaredFields
-                    .Where(f => f.IsPublic && !f.IsDefined( typeof (BoltIgnoreAttribute)))
+                    .Where(f => f.IsPublic && !f.IsDefined( typeof (PackStreamIgnoreAttribute)))
                     .ToList();
 
                 //TODO this will serialize it all!!!! -- only want public instance properties but doesn't get base properties
                 var properties = content.GetType().GetRuntimeProperties()
-                    .Where(prop => !prop.IsDefined(typeof (BoltIgnoreAttribute))).ToList();
+                    .Where(prop => !prop.IsDefined(typeof (PackStreamIgnoreAttribute))).ToList();
 
                 var dictionary = fields.ToDictionary(field => field.Name, field => field.GetValue(content));
                 foreach (var prop in properties)
@@ -137,10 +136,10 @@ namespace PackStream.NET.Packers
                     var key = PackStream.Unpack(packed[i]);
                     var value = PackStream.Unpack(packed[i + 1]);
                     Type genericType;
-                    if (global::PackStream.NET.Packers.Packers.List.IsEnumerable(typeof (TValue), out genericType))
+                    if (List.IsEnumerable(typeof (TValue), out genericType))
                     {
                         
-                        var method = typeof(global::PackStream.NET.Packers.Packers.List).GetTypeInfo().GetDeclaredMethod("Unpack");
+                        var method = typeof(List).GetTypeInfo().GetDeclaredMethod("Unpack");
                         var genericMethod = method.MakeGenericMethod(genericType);
                         var list = genericMethod.Invoke(null, new object[] {packed[i + 1].Original}) as IEnumerable;
                         value = (TValue) list;
@@ -167,13 +166,13 @@ namespace PackStream.NET.Packers
                 if (content[0] == 0xD9)
                 {
                     var markerSize = content.Skip(1).Take(2).ToArray();
-                    numberOfFields = int.Parse(System.BitConverter.ToString(markerSize).Replace("-", ""), NumberStyles.HexNumber);
+                    numberOfFields = int.Parse(BitConverter.ToString(markerSize).Replace("-", ""), NumberStyles.HexNumber);
                     return content.Skip(3).ToArray();
                 }
                 if (content[0] == 0xDA)
                 {
                     var markerSize = content.Skip(1).Take(4).ToArray();
-                    numberOfFields = int.Parse(System.BitConverter.ToString(markerSize).Replace("-", ""), NumberStyles.HexNumber);
+                    numberOfFields = int.Parse(BitConverter.ToString(markerSize).Replace("-", ""), NumberStyles.HexNumber);
                     return content.Skip(5).ToArray();
                 }
                 throw new ArgumentOutOfRangeException(nameof(content), content[0], "Unknown marker.");
@@ -182,7 +181,7 @@ namespace PackStream.NET.Packers
             public static dynamic UnpackRecord(byte[] content, IEnumerable<string> fields)
             {
                 //string to val
-                var elements = global::PackStream.NET.Packers.Packers.List.Unpack<dynamic>(content).ToList();
+                var elements = List.Unpack<dynamic>(content).ToList();
                 var fieldsList = fields.ToList();
                 if(fieldsList.Count != elements.Count)
                     throw new ArgumentException($"Mismatched field count ({fieldsList.Count}) to content count ({elements.Count})", nameof(fields));
@@ -237,12 +236,12 @@ namespace PackStream.NET.Packers
                 if (content[0] == 0xD9)
                 {
                     var markerSize = content.Skip(1).Take(2).ToArray();
-                    return int.Parse(System.BitConverter.ToString(markerSize).Replace("-", ""), NumberStyles.HexNumber);
+                    return int.Parse(BitConverter.ToString(markerSize).Replace("-", ""), NumberStyles.HexNumber);
                 }
                 if (content[0] == 0xDA)
                 {
                     var markerSize = content.Skip(1).Take(4).ToArray();
-                    return int.Parse(System.BitConverter.ToString(markerSize).Replace("-", ""), NumberStyles.HexNumber);
+                    return int.Parse(BitConverter.ToString(markerSize).Replace("-", ""), NumberStyles.HexNumber);
                 }
                 throw new ArgumentOutOfRangeException(nameof(content), content[0], "Unknown Marker");
             }
@@ -269,12 +268,12 @@ namespace PackStream.NET.Packers
 
                 //TODO: Getting static and private properties!!!
                 var properties = type.GetRuntimeProperties()
-                    .Where(prop => !prop.IsDefined(typeof (BoltIgnoreAttribute)));
+                    .Where(prop => !prop.IsDefined(typeof (PackStreamIgnoreAttribute)));
                 foreach (var property in properties)
                     if (toConvert.ContainsKey(property.Name))
                         property.SetValue(obj, (object) toConvert[property.Name]);
 
-                var fields = type.GetTypeInfo().DeclaredFields.Where(field => field.IsPublic && !field.IsDefined(typeof (BoltIgnoreAttribute)));
+                var fields = type.GetTypeInfo().DeclaredFields.Where(field => field.IsPublic && !field.IsDefined(typeof (PackStreamIgnoreAttribute)));
                 foreach (var field in fields)
                     if (toConvert.ContainsKey(field.Name))
                         field.SetValue(obj, (object) toConvert[field.Name]);

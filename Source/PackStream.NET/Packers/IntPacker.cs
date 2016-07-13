@@ -3,6 +3,7 @@ namespace PackStream.NET.Packers
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using global::PackStream.NET.Extensions;
 
     /*
      Integers
@@ -45,8 +46,6 @@ namespace PackStream.NET.Packers
 
     public static partial class Packers
     {
-        private static IBitConverter BitConverter => new BigEndianTargetBitConverter();
-
         public static class Int
         {
             public static bool Is(byte[] content)
@@ -87,10 +86,10 @@ namespace PackStream.NET.Packers
 
             }
 
-            private static readonly byte[] Int64Marker = { 0xCB, };
-            private static readonly byte[] Int32Marker = { 0xCA };
-            private static readonly byte[] Int16Marker = { 0xC9 };
-            private static readonly byte[] Int8Marker = { 0xC8 };
+            private static readonly byte[] Int64Marker = { Markers.Int64 };
+            private static readonly byte[] Int32Marker = { Markers.Int32 };
+            private static readonly byte[] Int16Marker = { Markers.Int16 };
+            private static readonly byte[] Int8Marker = { Markers.Int8 };
             private static readonly byte[] TinyIntMarker = { };
 
             internal static byte[] GetMarker(long value)
@@ -124,11 +123,8 @@ namespace PackStream.NET.Packers
                 if (value >= 2147483648)
                     size = 8;
 
-                var toAdd = size - output.Count;
-                for (var i = 0; i < toAdd; i++)
-                    output.Insert(0, 0);
-
-                return output.Skip(output.Count - size).ToArray();
+                var toPad = size - output.Count;
+                return output.PadLeft(toPad, (byte)0).Skip(output.Count - size).ToArray();
             }
 
             private static byte[] ConvertNegativeLongs(ICollection<byte> output, long value)
@@ -148,7 +144,7 @@ namespace PackStream.NET.Packers
 
             internal static byte[] ConvertLongToBytes(long value)
             {
-                var output = new List<byte>(BitConverter.GetBytes(value));
+                var output = new List<byte>(PackStreamBitConverter.GetBytes(value));
                 return value >= 0 ? ConvertPositiveLongs(output, value) : ConvertNegativeLongs(output, value);
             }
 
@@ -169,15 +165,14 @@ namespace PackStream.NET.Packers
                 var toInterpret = content.Skip(1).ToArray();
                 switch (content[0])
                 {
-//                    //skip 2 as it's 0x##
-                    case 0xC8:
+                    case Markers.Int8:
                         return (sbyte) toInterpret[0];
-                    case 0xC9:
-                        return BitConverter.ToInt16(toInterpret);
-                    case 0xCA:
-                        return BitConverter.ToInt32(toInterpret);
-                    case 0xCB:
-                        return BitConverter.ToInt64(toInterpret);
+                    case Markers.Int16:
+                        return PackStreamBitConverter.ToInt16(toInterpret);
+                    case Markers.Int32:
+                        return PackStreamBitConverter.ToInt32(toInterpret);
+                    case Markers.Int64:
+                        return PackStreamBitConverter.ToInt64(toInterpret);
                     default:
                         throw new ArgumentOutOfRangeException(nameof(content), content[0], "Unknown Marker");
                 }

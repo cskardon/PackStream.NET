@@ -41,7 +41,7 @@ namespace PackStream.NET.Tests
 
         private class SimpleClassWithBoltIgnoredProperty : SimpleClass
         {
-            [BoltIgnore]
+            [PackStreamIgnore]
             public bool B { get; set; }
         }
 
@@ -52,7 +52,7 @@ namespace PackStream.NET.Tests
             {
                 var toPack = new SimpleClassWithPrivateProperty {A = true};
                 toPack.SetB(true);
-                var expected = new List<byte> { 0xA2, 0x81, 0x42, (byte)Markers.True, 0x81, 0x41, (byte)Markers.True };
+                var expected = new List<byte> { 0xA2, 0x81, 0x42, Markers.True, 0x81, 0x41, Markers.True };
 
 
                 var actual = Packers.Map.Pack(toPack);
@@ -63,7 +63,7 @@ namespace PackStream.NET.Tests
             public void PacksAnonymousCorrectly()
             {
                 var toPack = new {A = true};
-                var expected = new List<byte> {0xA1, 0x81, 0x41, (byte) Markers.True}; //1 fields
+                var expected = new List<byte> {0xA1, 0x81, 0x41, Markers.True}; //1 fields
 
 
                 var actual = Packers.Map.Pack(toPack);
@@ -74,7 +74,7 @@ namespace PackStream.NET.Tests
             public void PacksDefinedClassCorrectly()
             {
                 var toPack = new SimpleClass {A = true};
-                var expected = new List<byte> {0xA1, 0x81, 0x41, (byte) Markers.True}; //1 fields
+                var expected = new List<byte> {0xA1, 0x81, 0x41, Markers.True}; //1 fields
 
 
                 var actual = Packers.Map.Pack(toPack);
@@ -85,7 +85,7 @@ namespace PackStream.NET.Tests
             public void PacksDefinedClassWithMultiplePropertiesCorrectly()
             {
                 var toPack = new MultiPropertyClass {A = true, B = false};
-                var expected = new List<byte> {0xA2, 0x81, 0x42, (byte) Markers.False, 0x81, 0x41, (byte) Markers.True};
+                var expected = new List<byte> {0xA2, 0x81, 0x42, Markers.False, 0x81, 0x41, Markers.True};
 
 
                 var actual = Packers.Map.Pack(toPack);
@@ -96,7 +96,7 @@ namespace PackStream.NET.Tests
             public void PacksDefinedClassCorrectlyIgnoringBoltIgnoredProperties()
             {
                 var toPack = new SimpleClassWithBoltIgnoredProperty {A = true};
-                var expected = new List<byte> {0xA1, 0x81, 0x41, (byte) Markers.True}; //1 fields
+                var expected = new List<byte> {0xA1, 0x81, 0x41, Markers.True}; //1 fields
 
 
                 var actual = Packers.Map.Pack(toPack);
@@ -137,7 +137,7 @@ namespace PackStream.NET.Tests
             public void UnpacksDefinedClass_WithProperty()
             {
                 var expected = new SimpleClass {A = true};
-                var toUnpack = new List<byte> {0xA1, 0x81, 0x41, (byte) Markers.True}; //1 fields
+                var toUnpack = new List<byte> {0xA1, 0x81, 0x41, Markers.True}; //1 fields
 
 
                 var actual = Packers.Map.Unpack<SimpleClass>(toUnpack.ToArray());
@@ -149,7 +149,7 @@ namespace PackStream.NET.Tests
             {
                 var expected = new SimpleClassWithPrivateProperty { A = true };
                 expected.SetB(true);
-                var toUnpack = new List<byte> { 0xA2, 0x81, 0x42, (byte)Markers.True, 0x81, 0x41, (byte)Markers.True };
+                var toUnpack = new List<byte> { 0xA2, 0x81, 0x42, Markers.True, 0x81, 0x41, Markers.True };
 
 
                 var actual = Packers.Map.Unpack<SimpleClassWithPrivateProperty>(toUnpack.ToArray());
@@ -160,7 +160,7 @@ namespace PackStream.NET.Tests
             public void UnpacksDefinedClass_WithField()
             {
                 var expected = new SimpleClassWithField {_a = true};
-                var toUnpack = new List<byte> {0xA1, 0x82, 0x5F, 0x61, (byte) Markers.True}; //1 fields
+                var toUnpack = new List<byte> {0xA1, 0x82, 0x5F, 0x61, Markers.True}; //1 fields
 
 
                 var actual = Packers.Map.Unpack<SimpleClassWithField>(toUnpack.ToArray());
@@ -171,7 +171,7 @@ namespace PackStream.NET.Tests
             public void UnpPacksDefinedClassCorrectlyIgnoringBoltIgnoredProperties()
             {
                 var expected = new SimpleClassWithBoltIgnoredProperty {A = true};
-                var toUnpack = new List<byte> {0xA1, 0x81, 0x41, (byte) Markers.True}.ToArray(); //1 fields
+                var toUnpack = new List<byte> {0xA1, 0x81, 0x41, Markers.True}.ToArray(); //1 fields
 
 
                 var actual = Packers.Map.Unpack<SimpleClassWithBoltIgnoredProperty>(toUnpack);

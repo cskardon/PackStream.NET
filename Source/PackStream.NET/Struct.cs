@@ -1,9 +1,10 @@
-namespace PackStream.NET.Packers
+namespace PackStream.NET
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using global::PackStream;
+    using global::PackStream.NET.Packers;
+
 
     public class Struct
     {
@@ -39,15 +40,6 @@ namespace PackStream.NET.Packers
         public byte[] ContentWithoutStructAndSignature { get; private set; }
         public SignatureBytes SignatureByte { get; set; }
 
-        public Node<T> GetNode<T>() where T : new()
-        {
-            if(SignatureByte != SignatureBytes.Node)
-                throw new InvalidOperationException("The data is not a node.");
-
-            return new Node<T>(ContentWithoutStructAndSignature);
-        }
-
-
         private static IDictionary<string, IEnumerable<string>> GetMetaData(Struct s) 
         {
             if (s.NumberOfFields == 0)
@@ -61,7 +53,7 @@ namespace PackStream.NET.Packers
         public override string ToString()
         {
             if (OriginalBytes != null && OriginalBytes.Length >= 0)
-                return BitConverter.ToString(OriginalBytes);
+                return PackStreamBitConverter.ToString(OriginalBytes);
             return "No original bytes to convert";
         }
     }

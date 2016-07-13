@@ -215,7 +215,7 @@
             public void PacksObjectsCorrectly()
             {
                 var toPack = new List<SimpleClass> {new SimpleClass {A = true}};
-                var expected = new List<byte> {0x91, 0xA1, 0x81, 0x41, (byte) Markers.True};
+                var expected = new List<byte> {0x91, 0xA1, 0x81, 0x41, Markers.True };
 
                 var actual = Packers.List.Pack(toPack);
                 actual.Should().Equal(expected);
@@ -284,17 +284,6 @@
 
                 var withoutMarker = Packers.List.GetLengthInBytes(bytes, false);
                 withoutMarker.Should().Be(3);
-            }
-
-            [Fact]
-            public void ReturnsRightSizeForNestedStructs()
-            {
-                var bytes = new byte[] {0x91, 0xB1, 0x70, 0x81, 0x61};
-                var withMarker = Packers.List.GetLengthInBytes(bytes, true);
-                withMarker.Should().Be(5);
-
-                var withoutMarker = Packers.List.GetLengthInBytes(bytes, false);
-                withoutMarker.Should().Be(4);
             }
 
             [Fact]

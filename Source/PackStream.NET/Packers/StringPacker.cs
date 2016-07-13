@@ -4,7 +4,7 @@ namespace PackStream.NET.Packers
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-    using global::PackStream;
+    
 
     /*  Text
         ----
@@ -130,12 +130,12 @@ namespace PackStream.NET.Packers
                 if (content[0] == 0xD1)
                 {
                     var markerSize = content.Skip(1).Take(2).ToArray();
-                    return (ushort) global::PackStream.NET.Packers.Packers.BitConverter.ToInt16(markerSize);
+                    return (ushort) PackStreamBitConverter.ToInt16(markerSize);
                 }
                 if (content[0] == 0xD2)
                 {
                     var markerSize = content.Skip(1).Take(4).ToArray();
-                    return  global::PackStream.NET.Packers.Packers.BitConverter.ToInt32(markerSize);
+                    return  PackStreamBitConverter.ToInt32(markerSize);
                 }
                 throw new ArgumentOutOfRangeException(nameof(content), content[0], "Unknown Marker");
             }

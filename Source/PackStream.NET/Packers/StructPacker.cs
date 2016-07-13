@@ -4,7 +4,6 @@ namespace PackStream.NET.Packers
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-    using global::PackStream;
 
     /*
       Structures
@@ -41,20 +40,6 @@ namespace PackStream.NET.Packers
             04 05 06  -- Struct(sig=0x7F, fields=[1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6]
      */
 
-
-    public interface IPacker
-    {
-        byte[] Pack<T>(T content);
-    }
-
-    public interface IUnpacker
-    {
-        T Unpack<T>(byte[] content) where T : new();
-        int GetSizeInBytes(byte[] content, bool includeMarker = true);
-        bool IsUnpackable(byte[] content);
-    }
-
-
     public static partial class Packers
     {
         public static class Struct
@@ -70,7 +55,7 @@ namespace PackStream.NET.Packers
                 if (bytes[0] == 0xDD)
                 {
                     var markerSize = bytes.Skip(1).Take(2).ToArray();
-                    return int.Parse(global::PackStream.NET.Packers.Packers.BitConverter.ToString(markerSize).Replace("-", ""), NumberStyles.HexNumber);
+                    return int.Parse(PackStreamBitConverter.ToString(markerSize).Replace("-", ""), NumberStyles.HexNumber);
                 }
 
                 throw new ArgumentOutOfRangeException(nameof(bytes), bytes[0], "Unknown Marker");
@@ -81,13 +66,12 @@ namespace PackStream.NET.Packers
                 return (content[0] >= 0xB0 && content[0] <= 0xBF) || content[0] == 0xDC || content[0] == 0xDD;
             }
 
-            public static global::PackStream.NET.Packers.Struct Unpack(byte[] content)
+            public static NET.Struct Unpack(byte[] content)
             {
                 if (!IsStruct(content))
                     throw new ArgumentException("Content doesn't represent a Struct.", nameof(content));
 
-                var output = new global::PackStream.NET.Packers.Struct(content);
-                output.NumberOfFields = GetNumberOfFields(content);
+                var output = new NET.Struct(content) {NumberOfFields = GetNumberOfFields(content)};
                 output.SignatureByte = GetSignatureByte(content, output.NumberOfFields);
 
                 return output;

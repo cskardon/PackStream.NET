@@ -8,19 +8,19 @@ namespace PackStream.NET.Packers
         {
             public static bool Is(byte[] content)
             {
-                return content[0] == (byte) Markers.True || content[0] == (byte) Markers.False;
+                return content[0] == Markers.True || content[0] == Markers.False;
             }
 
             public static byte[] Pack(bool content)
             {
-                return content ? new[] {(byte) Markers.True} : new[] {(byte) Markers.False};
+                return content ? new[] {Markers.True} : new[] {Markers.False};
             }
 
             public static bool Unpack(byte[] content)
             {
-                if (content[0] == (byte) Markers.True)
+                if (content[0] == Markers.True)
                     return true;
-                if (content[0] == (byte) Markers.False)
+                if (content[0] == Markers.False)
                     return false;
 
                 throw new ArgumentOutOfRangeException(nameof(content), content[0], "Marker Unknown");

@@ -286,33 +286,45 @@ namespace PackStream.NET
         */
 
 
-
     public enum PackType
     {
         Unknown,
-        Structure,
         Map,
         Text,
         Integer,
         Float,
         List,
         Boolean,
+        Structure,
         Null
     }
 
     public static class PackStream
     {
+        public static void AddPacker(IPacker packer)
+        {
+            ActualCustomPackers.Add(packer);
+        }
+
+        private static readonly List<IPacker> ActualCustomPackers = new List<IPacker>();
+        public static IReadOnlyCollection<IPacker> CustomPackers => ActualCustomPackers;
+
         public static T Unpack<T>(byte[] content) where T : new()
         {
+            var underlyingType = Nullable.GetUnderlyingType(typeof(T)) ?? typeof(T);
+            var customPacker = CustomPackers.FirstOrDefault(p => p.CanPack(underlyingType));
+            if (customPacker != null)
+                return (T) customPacker.Unpack(content);
+
             var packedEntities = GetPackedEntities(content);
             if (packedEntities.Length != 1)
-                throw new ArgumentException(packedEntities.Length > 1 ? "Too many entities" :"No entities supplied", nameof(content));
+                throw new ArgumentException(packedEntities.Length > 1 ? "Too many entities" : "No entities supplied", nameof(content));
 
             var entity = packedEntities.First();
             switch (entity.PackType)
             {
                 case PackType.Map:
-                    return NET.Packers.Packers.Map.Unpack<T>(entity.Original);
+                    return Packers.Packers.Map.Unpack<T>(entity.Original);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -328,20 +340,18 @@ namespace PackStream.NET
         {
             switch (content.PackType)
             {
-                case PackType.Structure:
-                    return NET.Packers.Packers.Struct.Unpack(content.Original);
                 case PackType.Map:
-                    return NET.Packers.Packers.Map.Unpack<dynamic>(content.Original);
+                    return Packers.Packers.Map.Unpack<dynamic>(content.Original);
                 case PackType.Text:
-                    return NET.Packers.Packers.Text.Unpack(content.Original);
+                    return Packers.Packers.Text.Unpack(content.Original);
                 case PackType.Integer:
-                    return NET.Packers.Packers.Int.Unpack(content.Original);
+                    return Packers.Packers.Int.Unpack(content.Original);
                 case PackType.Float:
-                    return NET.Packers.Packers.Double.Unpack(content.Original);
+                    return Packers.Packers.Double.Unpack(content.Original);
                 case PackType.List:
-                    return NET.Packers.Packers.List.Unpack<dynamic>(content.Original);
+                    return Packers.Packers.List.Unpack<dynamic>(content.Original);
                 case PackType.Boolean:
-                    return NET.Packers.Packers.Bool.Unpack(content.Original);
+                    return Packers.Packers.Bool.Unpack(content.Original);
                 case PackType.Null:
                     return null;
                 case PackType.Unknown:
@@ -374,51 +384,50 @@ namespace PackStream.NET
             if (content == null || content.Length == 0)
                 return type;
 
-            if (NET.Packers.Packers.Double.Is(content))
+            if (Packers.Packers.Double.Is(content))
             {
                 type = PackType.Float;
-                size = NET.Packers.Packers.Double.GetExpectedSizeInBytes(content);
+                size = Packers.Packers.Double.GetExpectedSizeInBytes(content);
             }
-            if (NET.Packers.Packers.Null.Is(content))
+            if (Packers.Packers.Null.Is(content))
             {
                 type = PackType.Null;
                 size = 1;
             }
-            if (NET.Packers.Packers.Text.Is(content))
+            if (Packers.Packers.Text.Is(content))
             {
                 type = PackType.Text;
-                size = NET.Packers.Packers.Text.GetExpectedSize(content) + NET.Packers.Packers.Text.SizeOfMarkerInBytes(content);
+                size = Packers.Packers.Text.GetExpectedSize(content) + Packers.Packers.Text.SizeOfMarkerInBytes(content);
             }
-            if (NET.Packers.Packers.Bool.Is(content))
+            if (Packers.Packers.Bool.Is(content))
             {
                 type = PackType.Boolean;
                 size = 1;
             }
-            if (NET.Packers.Packers.Int.Is(content))
+            if (Packers.Packers.Int.Is(content))
             {
                 type = PackType.Integer;
-                size = NET.Packers.Packers.Int.GetExpectedSizeInBytes(content) + NET.Packers.Packers.Int.SizeOfMarkerInBytes(content);
+                size = Packers.Packers.Int.GetExpectedSizeInBytes(content) + Packers.Packers.Int.SizeOfMarkerInBytes(content);
             }
 
-            if (NET.Packers.Packers.Map.Is(content))
+            if (Packers.Packers.Map.Is(content))
             {
                 type = PackType.Map;
                 //Not the size, but number of fields.
                 //in this case (and others??) size = content up to 0x00 0x00??
                 size = content.Length;
             }
-            if (NET.Packers.Packers.List.IsUnpackable(content))
+            if (Packers.Packers.List.IsUnpackable(content))
             {
                 type = PackType.List;
                 size = content.Length;
             }
-            if (NET.Packers.Packers.Struct.IsStruct(content))
+            if (Packers.Packers.Struct.IsStruct(content))
             {
                 type = PackType.Structure;
                 size = content.Length;
-                numberOfItems = NET.Packers.Packers.Struct.GetNumberOfItems(content);
+                numberOfItems = Packers.Packers.Struct.GetNumberOfItems(content);
             }
-
             return type;
         }
 
@@ -436,30 +445,34 @@ namespace PackStream.NET
         public static byte[] Pack<T>(T toPack, bool addZeroEnding = false)
         {
             if (toPack == null)
-                return new[] {(byte) Markers.Null};
+                return new[] {Markers.Null};
 
             var underlyingType = Nullable.GetUnderlyingType(toPack.GetType()) ?? toPack.GetType();
 
+            var customPacker = CustomPackers.FirstOrDefault(p => p.CanPack(underlyingType));
+            if (customPacker != null)
+                return customPacker.Pack(toPack);
+
             byte[] output;
             if (underlyingType == typeof (bool))
-                output = NET.Packers.Packers.Bool.Pack(Convert.ToBoolean(toPack));
+                output = Packers.Packers.Bool.Pack(Convert.ToBoolean(toPack));
 
             else if (underlyingType == typeof (string))
-                output = NET.Packers.Packers.Text.Pack(toPack as string);
+                output = Packers.Packers.Text.Pack(toPack as string);
 
             else if (underlyingType == typeof (long) || underlyingType == typeof (int) || underlyingType == typeof (short) || underlyingType == typeof (sbyte))
-                output = NET.Packers.Packers.Int.Pack(Convert.ToInt64(toPack));
+                output = Packers.Packers.Int.Pack(Convert.ToInt64(toPack));
 
             else if (underlyingType == typeof (float) || underlyingType == typeof (double) || underlyingType == typeof (decimal))
-                output = NET.Packers.Packers.Double.Pack(Convert.ToDouble(toPack));
+                output = Packers.Packers.Double.Pack(Convert.ToDouble(toPack));
 
-            else if (NET.Packers.Packers.List.IsPackable(underlyingType))
+            else if (Packers.Packers.List.IsPackable(underlyingType))
             {
                 Type genericParameter;
-                NET.Packers.Packers.List.IsEnumerable(underlyingType, out genericParameter);
-                output = NET.Packers.Packers.List.PackwithType(toPack, genericParameter);
+                Packers.Packers.List.IsEnumerable(underlyingType, out genericParameter);
+                output = Packers.Packers.List.PackwithType(toPack, genericParameter);
             }
-            else output = NET.Packers.Packers.Map.Pack(toPack);
+            else output = Packers.Packers.Map.Pack(toPack);
 
             if (addZeroEnding)
             {
@@ -474,7 +487,7 @@ namespace PackStream.NET
         public static byte[] ConvertSizeToBytes(long length, int? size = null)
         {
             var hexValue = length.ToString("X2");
-            if (hexValue.Length%2 != 0)
+            if (hexValue.Length % 2 != 0)
                 hexValue = hexValue.PadLeft(hexValue.Length + 1, '0');
 
             var output = new List<byte>();
@@ -484,7 +497,7 @@ namespace PackStream.NET
 
             if (size != null && size > 0)
             {
-                var toAdd = output.Count%(size*2);
+                var toAdd = output.Count % (size * 2);
                 if (toAdd > 0)
                     for (var i = 0; i < toAdd; i++)
                         output.Insert(0, 0x0);
@@ -495,7 +508,7 @@ namespace PackStream.NET
 
         public static dynamic UnpackRecord(byte[] value, IEnumerable<string> fields)
         {
-            return NET.Packers.Packers.Map.UnpackRecord(value, fields);
+            return Packers.Packers.Map.UnpackRecord(value, fields);
         }
 
         public static int GetLengthOfFirstItem(byte[] content, bool includeMarker = true)
@@ -509,27 +522,24 @@ namespace PackStream.NET
             var contentSizeInBytes = 0;
             switch (first.PackType)
             {
-                case PackType.Structure:
-                    markerSizeInBytes = NET.Packers.Packers.Struct.GetExpectedSizeInBytes(content);
-                    break;
                 case PackType.Map:
-                    markerSizeInBytes = NET.Packers.Packers.Map.SizeOfMarkerInBytes(content);
-                    contentSizeInBytes = NET.Packers.Packers.Map.GetExpectedSizeInBytes(content);
+                    markerSizeInBytes = Packers.Packers.Map.SizeOfMarkerInBytes(content);
+                    contentSizeInBytes = Packers.Packers.Map.GetExpectedSizeInBytes(content);
                     break;
                 case PackType.Text:
-                    markerSizeInBytes = NET.Packers.Packers.Text.SizeOfMarkerInBytes(content);
-                    contentSizeInBytes = NET.Packers.Packers.Text.GetExpectedSize(content);
+                    markerSizeInBytes = Packers.Packers.Text.SizeOfMarkerInBytes(content);
+                    contentSizeInBytes = Packers.Packers.Text.GetExpectedSize(content);
                     break;
                 case PackType.Integer:
-                    markerSizeInBytes = NET.Packers.Packers.Int.SizeOfMarkerInBytes(content);
-                    contentSizeInBytes = NET.Packers.Packers.Int.GetExpectedSizeInBytes(content);
+                    markerSizeInBytes = Packers.Packers.Int.SizeOfMarkerInBytes(content);
+                    contentSizeInBytes = Packers.Packers.Int.GetExpectedSizeInBytes(content);
                     break;
                 case PackType.Float:
-                    markerSizeInBytes = NET.Packers.Packers.Double.SizeOfMarkerInBytes(content);
-                    contentSizeInBytes = NET.Packers.Packers.Double.GetExpectedSizeInBytes(content);
+                    markerSizeInBytes = Packers.Packers.Double.SizeOfMarkerInBytes(content);
+                    contentSizeInBytes = Packers.Packers.Double.GetExpectedSizeInBytes(content);
                     break;
                 case PackType.List:
-                    contentSizeInBytes = NET.Packers.Packers.List.GetLengthInBytes(content, true);
+                    contentSizeInBytes = Packers.Packers.List.GetLengthInBytes(content, true);
                     break;
                 case PackType.Boolean:
                 case PackType.Null:

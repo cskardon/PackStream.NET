@@ -73,14 +73,14 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="DoublePackerTests.cs" />
-    <Compile Include="IntPackerTests.cs" />
-    <Compile Include="ListPackerTests.cs" />
-    <Compile Include="ObjectPackerTests.cs" />
+    <Compile Include="Packers\DoublePackerTests.cs" />
+    <Compile Include="Packers\IntPackerTests.cs" />
+    <Compile Include="Packers\ListPackerTests.cs" />
+    <Compile Include="Packers\ObjectPackerTests.cs" />
     <Compile Include="PackStreamTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StringPackerTests.cs" />
-    <Compile Include="StructPackerTests.cs" />
+    <Compile Include="Packers\StringPackerTests.cs" />
+    <Compile Include="Packers\StructPackerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -91,6 +91,7 @@
       <Name>PackStream.NET</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

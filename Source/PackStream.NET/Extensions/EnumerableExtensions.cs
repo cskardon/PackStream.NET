@@ -19,5 +19,17 @@
         {
             return enumerable == null || !enumerable.Any();
         }
+
+        public static IList<T> PadLeft<T>(this IList<T> list, int length, T padWith)
+        {
+            for (int i = 0; i < length; i++)
+            {
+                list.Insert(0, padWith);
+            }
+
+            return list;
+        }
     }
+
+    
 }
