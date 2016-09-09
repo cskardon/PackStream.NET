@@ -10,6 +10,11 @@
     <description>A .NET implementation of PackStream - a serialization solution by Neo4j.</description>
     <tags>neo4j bolt packstream</tags>
     <dependencies>
+      <group targetFramework="netstandard1.0">
+        <dependency id="Microsoft.CSharp" version="4.0.1" />
+        <dependency id="NETStandard.Library" version="1.6.0"/>
+        <dependency id="System.Dynamic.Runtime" version="4.0.11"/>
+      </group>
       <group targetFramework="dotnet">
         <dependency id="Microsoft.CSharp" version="4.0.1" />
         <dependency id="NETStandard.Library" version="1.6.0"/>
@@ -18,9 +23,11 @@
     </dependencies>
   </metadata>
   <files>
-  
-    <file src="Source\PackStream.NET\bin\Release\PackStream.NET.dll" target="lib\dotnet" />
-    <file src="Source\PackStream.NET\bin\Release\PackStream.NET.pdb" target="lib\dotnet" />
-    <file src="Source\PackStream.NET\bin\Release\PackStream.NET.xml" target="lib\dotnet" />
+    <file src="Source\PackStream.NET\bin\debug\PackStream.NET.dll" target="lib\netstandard1.0" />
+    <file src="Source\PackStream.NET\bin\debug\PackStream.NET.pdb" target="lib\netstandard1.0" />
+    <file src="Source\PackStream.NET\bin\debug\PackStream.NET.xml" target="lib\netstandard1.0" />  
+    <file src="Source\PackStream.NET\bin\debug\PackStream.NET.dll" target="lib\dotnet" />
+    <file src="Source\PackStream.NET\bin\debug\PackStream.NET.pdb" target="lib\dotnet" />
+    <file src="Source\PackStream.NET\bin\debug\PackStream.NET.xml" target="lib\dotnet" />
   </files>
 </package>

@@ -102,18 +102,32 @@ namespace PackStream.NET.Packers
 
             private static byte[] PackDictionary(IDictionary content)
             {
-                var arguments = content.GetType().GenericTypeArguments;
+                var bytes = new List<byte>();
+                bytes.AddRange(GetMarker(content.Count));
+
+                if (content.Count == 0)
+                    return bytes.ToArray();
+
+                var arguments = content.GetType().GetTypeInfo().GenericTypeArguments;
                 var keyType = arguments[0];
                 var valueType = arguments[1];
 
-                var bytes = new List<byte>();
-                bytes.AddRange(GetMarker(content.Count));
+                
 
                 foreach (var item in content.Keys)
                 {
                     var keyBytes = PackStream.Pack(Convert.ChangeType(item, keyType));
                     bytes.AddRange(keyBytes);
-                    bytes.AddRange(PackStream.Pack(Convert.ChangeType(content[item], valueType)));
+                    
+                    try
+                    {
+                        var x = (valueType == typeof(object)) ? (object) content[item] : Convert.ChangeType(content[item], valueType);
+                        bytes.AddRange(PackStream.Pack(x));
+                    }
+                    catch (Exception ex)
+                    {
+                        int i = 0;
+                    }
                 }
 
                 return bytes.ToArray();

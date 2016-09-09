@@ -116,6 +116,18 @@ namespace PackStream.NET.Tests
                 var actual = Packers.Map.Pack(dictionary);
                 actual.Should().Equal(expected);
             }
+
+            [Fact]
+            public void PackEmptyDictionaryCorrectly()
+            {
+                var dic = new Dictionary<string, string>();
+                var packed = Packers.Map.Pack(dic);
+
+                packed.Should().NotBeNull();
+                var expected = new byte[] { 0xA0 };
+
+                packed.Should().BeEquivalentTo(expected);
+            }
         }
 
         public class UnpackMethod
