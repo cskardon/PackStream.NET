@@ -1,6 +1,6 @@
 namespace PackStream.NET
 {
-    public enum SignatureBytes
+    public enum SignatureBytes 
     {
         /// <summary>INIT &lt;user_agent&gt;</summary>
         Init = 0x01,

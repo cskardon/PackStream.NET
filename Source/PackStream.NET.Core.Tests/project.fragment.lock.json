@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "exports": {
+    "PackStream.NET/1.0.0": {
+      "type": "project",
+      "framework": ".NETStandard,Version=v1.0",
+      "compile": {
+        "bin/Debug/PackStream.NET.dll": {}
+      },
+      "runtime": {
+        "bin/Debug/PackStream.NET.dll": {}
+      },
+      "contentFiles": {
+        "bin/Debug/PackStream.NET.pdb": {
+          "buildAction": "None",
+          "codeLanguage": "any",
+          "copyToOutput": true
+        }
+      }
+    }
+  }
+}
